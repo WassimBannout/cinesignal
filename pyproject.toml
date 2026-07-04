@@ -1,0 +1,60 @@
+[project]
+name = "cinesignal"
+version = "0.1.0"
+description = "Movie Success Intelligence — a portfolio-grade interactive analytics product answering 'what makes a movie successful?'"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Wassim Bannout" }]
+dependencies = [
+    "pandas>=2.2",
+    "pyarrow>=16.0",     # Parquet I/O for the clean dataset
+    "numpy>=1.26",
+]
+
+[project.optional-dependencies]
+# App + charts (Phase 0/1 delivery vehicle)
+app = [
+    "streamlit>=1.36",
+    "altair>=5.3",
+]
+# Modeling (Phase 1, core DS deliverable)
+model = [
+    "scikit-learn>=1.5",
+    "shap>=0.45",
+]
+# EDA notebook (Phase 0, core DS artifact)
+eda = [
+    "jupyter>=1.0",
+    "matplotlib>=3.9",
+    "seaborn>=0.13",
+    "scipy>=1.13",       # hypothesis tests / effect sizes
+]
+# Dev tooling
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.5",
+]
+
+[project.scripts]
+# One-command, deterministic pipeline entry points (FR-1 AC-1.5)
+cinesignal-acquire = "pipeline.acquire:main"
+cinesignal-etl = "pipeline.etl:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["pipeline"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
