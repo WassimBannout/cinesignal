@@ -17,7 +17,7 @@
 | **Status** | Approved direction v1.1 — target role resolved |
 | **Target role** | **Data Scientist** — modeling, statistics & interpretation are core deliverables |
 | **Intended usage** | **Self-contained brief.** Designed to be the *sole surviving artifact*; predecessor code, the analysis doc, and raw data files are expected to be deleted. A fresh Claude Code session should build the project from this file alone |
-| **Last updated** | 2026-07-04 |
+| **Last updated** | 2026-07-05 |
 | **Related docs** | None required. `CODEBASE_ANALYSIS.md`, if present, is historical only and may be deleted |
 | **Predecessor** | A 53-line Streamlit genre-filter demo — retired, not extended; assume it no longer exists |
 
@@ -28,6 +28,7 @@
 | 0.1 | 2026-07-04 | PM | Initial skeleton |
 | 1.0 | 2026-07-04 | PM | First complete draft |
 | 1.1 | 2026-07-04 | PM | Target role resolved (Data Scientist); modeling & EDA promoted to core; document made self-contained for a fresh session |
+| 1.2 | 2026-07-05 | Builder | Added [§0.4 Implementation Status](#04-implementation-status-as-of-2026-07-05) recording Phase 0 as complete; no requirements changed |
 
 ---
 
@@ -102,6 +103,51 @@ Paste something like this to bootstrap the build:
 
 > If any statement in this PRD ever conflicts with leftover files in the repo, **this PRD
 > wins** — the files are legacy and slated for deletion.
+
+### 0.4 Implementation status (as of 2026-07-05)
+
+> **This subsection is a living status marker, not a requirement.** The rest of the PRD is
+> the durable spec; this is a snapshot of _how much of it is built_. A fresh session should
+> read it to know where to pick up. Source of truth for details is always the repo + git
+> history; if this drifts, trust the code.
+
+**Headline: Phase 0 (Foundation & EDA) is complete and green in CI. Phase 1 (modeling) is
+next and not yet started.**
+
+- **Repo:** public — <https://github.com/WassimBannout/cinesignal>. CI (GitHub Actions: ruff +
+  pytest) runs on every push/PR and is **passing** (22 tests: pure ETL transforms + headless
+  Streamlit `AppTest` smoke tests).
+- **Stack in use:** Python · pandas · Parquet · **Streamlit** (multipage) · **Altair** charts ·
+  Jupyter for the EDA. Modeling deps (scikit-learn, SHAP) are declared but unused until P1.
+- **Not yet deployed** to a public URL (Streamlit Cloud) — that is a P3 task.
+
+**Per-feature status** (see §11 for the specs, §18 for the phase plan):
+
+| FR | Feature | Phase | Status |
+|---|---|:---:|---|
+| FR-1 | Data pipeline (ETL) + data-quality report | P0 | ✅ Done — `pipeline/`, deterministic, one-command; `reports/data_quality.md` auto-generated |
+| FR-0 | Narrative EDA notebook | P0 | ✅ Done — `notebooks/01_eda.ipynb`, committed **rendered**, stats-backed claims, motivates the model |
+| FR-2 | Overview dashboard | P0 | ✅ Done — KPI row, budget-vs-revenue log-log scatter + break-even line, films/year + coverage note |
+| FR-3 | Profitability explorer | P0 | ✅ Done — visible ROI formula, filters, per-genre ROI distributions, multi-genre caveat, empty state |
+| FR-7 | Methodology & Data-Quality page | P0 | ✅ Done — in-app, surfaces methodology, DQ report, data dictionary + a live snapshot |
+| FR-10 | Success-Score model + interpretation | P1 | ⬜ Not started — **the next deliverable**; EDA already lays out the modeling brief |
+| FR-4 | Genres & Trends | P1 | ⬜ Not started |
+| FR-5 | Critics vs. Audience | P1 | ⬜ Not started — needs the deferred IMDB `title.ratings` enrichment (TMDB has no critic score) |
+| FR-6 | Movie Deep-Dive | P2 | ⬜ Not started |
+| FR-9 | Talent Impact | P2 | ⬜ Not started |
+| FR-8 | Export & Share | Should | ⬜ Not started |
+| — | Public deployment + demo write-up | P3 | ⬜ Not started |
+
+**Open questions** (§17): OQ2, OQ4, OQ8 resolved earlier. Since then — **OQ5 resolved**: the
+small clean Parquet **is committed** (`data/processed/movies_clean.parquet`) for CI/deploy
+reliability while the pipeline still regenerates it. **OQ3** settled on **Streamlit**; **OQ1**
+name remains the working "CineSignal"; **OQ6** (Polars) declined for now; **OQ7** (theming)
+kept minimal — credibility over showcase.
+
+**What a fresh session should do next:** review the EDA notebook and the three P0 app views,
+then begin **Phase 1 — feature engineering + the leakage-free Success-Score model (FR-10)**,
+per the synthesis table at the end of `notebooks/01_eda.ipynb`. Per §18/AC-10.2, keep the
+split temporal and exclude post-release signals (`vote_*`, `popularity`) as leakage.
 
 ---
 
