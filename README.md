@@ -12,8 +12,10 @@ It deliberately separates the three things people blur together when they say "s
 
 …and never lets one masquerade as another. That distinction is the whole point.
 
-> **Status:** Phase 0 (Foundation & EDA) in progress — reproducible ETL + data-quality
-> report shipped; narrative EDA notebook and app views next. See the roadmap below.
+> **Status:** Phase 0 (Foundation & EDA) essentially complete — reproducible ETL +
+> data-quality report, a rendered narrative EDA notebook, and a multipage Streamlit app
+> (Overview · Profitability · Methodology) all shipped and green in CI. Phase 1 (modeling)
+> is next. See the roadmap below.
 
 ---
 
@@ -25,11 +27,22 @@ as first-class features. Where a design choice trades off "flashy" against "defe
 picks defensible: the [Methodology](docs/methodology.md) and [Decisions log](docs/decisions.md)
 are part of the product, not an afterthought.
 
-## Three insights _(placeholder — filled after the EDA in Phase 0/1)_
+## Three insights (from the [EDA notebook](notebooks/01_eda.ipynb))
 
-1. _…_
-2. _…_
-3. _…_
+1. **Bigger budgets buy revenue, not efficiency.** Budget and revenue rise together
+   (log–log Pearson _r_ ≈ 0.62), but budget and **ROI are negatively related**
+   (Spearman _ρ_ = −0.14, _p_ ≪ 0.001) — big-budget films return *less* per dollar. Grossing
+   high and being profitable are genuinely different things.
+2. **The most profitable genres are the cheap ones.** **Horror, Music, and Animation** top
+   the table on median ROI (~1.8–2.1×) while **Western, History, and Crime** sit at the
+   bottom — and the gap is not chance (Kruskal–Wallis _H_ = 82, _p_ ≪ 0.001).
+3. **ROI is wildly skewed, so the median is the only honest headline.** Mean ROI (10.1×) is a
+   fiction driven by a few microbudget breakouts; the **median is 1.30×**, and **~76%** of
+   films that report financials turn a profit. Timing matters too — summer and holiday
+   releases beat September, the industry's "dump month."
+
+> Every figure is reproducible from the committed dataset; see
+> [Methodology](docs/methodology.md) for how each number is computed.
 
 ---
 
@@ -50,11 +63,19 @@ python -m pipeline.acquire           # verifies the files are present (fails lou
 # 3. Build the clean dataset + data-quality report
 python -m pipeline.etl               # → data/processed/movies_clean.parquet + reports/data_quality.md
 
-# 4. Tests + lint
-pytest && ruff check pipeline tests
+# 4. Explore the analysis (narrative EDA notebook, committed rendered)
+jupyter lab notebooks/01_eda.ipynb
+
+# 5. Run the app (multipage: Overview · Profitability · Methodology)
+pip install -e ".[app]"
+streamlit run app/main.py
+
+# 6. Tests + lint
+pytest && ruff check pipeline tests app
 ```
 
-The pipeline is **deterministic** and re-runnable from that single `etl` command.
+The pipeline is **deterministic** and re-runnable from that single `etl` command. The app
+reads the committed demo Parquet, so it boots from a clean clone without re-running the ETL.
 
 ## What's in here
 
@@ -80,7 +101,7 @@ endorsed or certified by TMDb; movie data is courtesy of
 
 | Phase | Theme | Status |
 |---|---|---|
-| **P0** | Foundation & EDA — ETL, DQ report, EDA notebook, Overview, Profitability, Methodology | 🚧 in progress |
+| **P0** | Foundation & EDA — ETL, DQ report, EDA notebook, Overview, Profitability, Methodology | ✅ complete |
 | **P1** | Modeling & depth — feature engineering, Success-Score model + interpretation, Trends, Critics vs Audience | ⬜ |
 | **P2** | Product depth — Movie Deep-Dive, Talent Impact, export/share | ⬜ |
 | **P3** | Polish & launch — accessibility, visual refinement, write-up | ⬜ |
